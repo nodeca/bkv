@@ -1,0 +1,16 @@
+env:
+  browser:  true
+
+parserOptions:
+  ecmaVersion: 2018
+
+ignorePatterns:
+  - dist/
+
+rules:
+  camelcase: 0
+  key-spacing: 0
+  no-multi-spaces: 0
+  padded-blocks: 0
+  no-var: 0
+  no-multiple-empty-lines: 0
