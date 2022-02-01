@@ -36,7 +36,7 @@ class IdbStorage {
       this.wikr = window.IDBKeyRange
 
       let req
-      const test_db_name = '__idb_test__'
+      const test_db_name = `__bkv_idb_test__${Math.random()}`
 
       try {
         req = indexeddb.open(test_db_name)

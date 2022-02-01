@@ -41,7 +41,7 @@ is not set.
 
 Options:
 
-- `prefix` - Data namespace. Default - `bag`. Used to separate data for
+- `prefix` - Data namespace. Default - `bkv`. Used to separate data for
    multiple instances, if required.
 - `stores` - Array of storage names to use, ordered by preference.
   Default `['indexeddb', 'localstorage', 'zero']`. Set to `['indexeddb', 'localstorage']` if no fallback to memory required.
