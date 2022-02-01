@@ -1,7 +1,7 @@
 {
   "name": "bkv",
   "description": "Browser key/value storage with simple interface",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "scripts": {
     "lint": "standardx -v .",
     "build": "rollup -c",

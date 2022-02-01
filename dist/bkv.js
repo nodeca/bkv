@@ -1,4 +1,4 @@
-/*! bkv 1.0.0 https://github.com/nodeca/bkv @license MIT */
+/*! bkv 1.0.1 https://github.com/nodeca/bkv @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
@@ -199,7 +199,7 @@
           _this.widb = indexeddb;
           _this.wikr = window.IDBKeyRange;
           var req;
-          var test_db_name = '__idb_test__';
+          var test_db_name = "__bkv_idb_test__".concat(Math.random());
 
           try {
             req = indexeddb.open(test_db_name);

@@ -1,4 +1,4 @@
-/*! bkv 1.0.0 https://github.com/nodeca/bkv @license MIT */
+/*! bkv 1.0.1 https://github.com/nodeca/bkv @license MIT */
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
@@ -193,7 +193,7 @@ var IdbStorage = /*#__PURE__*/function () {
         _this.widb = indexeddb;
         _this.wikr = window.IDBKeyRange;
         var req;
-        var test_db_name = '__idb_test__';
+        var test_db_name = "__bkv_idb_test__".concat(Math.random());
 
         try {
           req = indexeddb.open(test_db_name);
