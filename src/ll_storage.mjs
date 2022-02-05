@@ -39,7 +39,7 @@ class LlStorage {
         // Just remove all keys, without conditions, no optimizations needed.
         if (e.name.toUpperCase().indexOf('QUOTA') === -1) throw e
 
-        for (const name of Object.keys(localStorage))  {
+        for (const name of Object.keys(localStorage)) {
           const k = name.split(this._ns)[1]
           if (k) { this._remove_sync(k) }
         }
@@ -70,6 +70,23 @@ class LlStorage {
       return Promise.resolve(this._get_sync(key))
     } catch (e) {
       return Promise.reject(new Error(`[BKV.ll_storage] Can't read key: ${key}`))
+    }
+  }
+
+  getAll () {
+    try {
+      const out = []
+      for (const name of Object.keys(localStorage)) {
+        const key = name.split(this._ns)[1]
+
+        if (!key) continue
+        const res = this._get_sync(key)
+        if (typeof res === 'undefined') continue
+        out.push({ key, ...res })
+      }
+      return Promise.resolve(out)
+    } catch (e) {
+      return Promise.reject(e)
     }
   }
 

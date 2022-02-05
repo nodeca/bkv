@@ -25,6 +25,14 @@ class ZeroStorage {
     return Promise.resolve(zs[this._ns][key] || {})
   }
 
+  getAll () {
+    const out = []
+    Object.keys(zs[this._ns]).forEach(key => {
+      out.push({ key, ...zs[this._ns][key] })
+    })
+    return Promise.resolve(out)
+  }
+
   clear (expiredOnly) {
     const now = Date.now()
 

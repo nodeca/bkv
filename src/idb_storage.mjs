@@ -127,6 +127,26 @@ class IdbStorage {
     })
   }
 
+  getAll () {
+    return new Promise((resolve, reject) => {
+      const tx = this.db.transaction(['kv'])
+
+      tx.onerror = e => { reject(new Error(`${ERR_NS} Data get error: ${e.target}`)) }
+
+      const out = []
+
+      tx.objectStore('kv').openCursor().onsuccess = e => {
+        const cursor = e.target.result
+        if (cursor) {
+          out.push(cursor.value)
+          cursor.continue()
+        } else {
+          resolve(out)
+        }
+      }
+    })
+  }
+
   clear (expiredOnly) {
     return new Promise((resolve, reject) => {
       const tx = this.db.transaction(['kv'], 'readwrite')

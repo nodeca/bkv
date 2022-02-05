@@ -37,7 +37,7 @@ class BKV {
         // Skip on success
         if (prev) return true
 
-        const lc_name = name.toLocaleLowerCase()
+        const lc_name = name.toLowerCase()
         this.storage_name = lc_name
         this.storage = new storages[lc_name](this._prefix)
 
@@ -72,6 +72,19 @@ class BKV {
         if (expire === 0 || (expire > 0 && expire > Date.now())) return value
         // Expired => force cleanup & return default
         return this.clear(true).then(() => default_value)
+      })
+  }
+
+  getAll () {
+    return this.init()
+      .then(() => this.storage.getAll())
+      .then(arr => {
+        const out = arr
+          .filter(d => d.expire === 0 || d.expire > Date.now())
+          .map(d => ({ key: d.key, value: d.value }))
+
+        if (out.length === arr.length) return out
+        return this.clear(true).then(() => out)
       })
   }
 

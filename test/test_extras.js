@@ -8,7 +8,7 @@ describe('extra tests', function () {
   describe('API', () => {
     it('use storage by priority', async () => {
       const b  = new BKV({ stores: ['failing', 'localstorage'] })
-      const b1 = new BKV({ stores: ['localstorage'] })
+      const b1 = new BKV({ stores: ['localstorage', 'failing'] })
 
       await b.set('ls_test', 'ls_test')
       assert.strictEqual(await b1.get('ls_test'), 'ls_test')

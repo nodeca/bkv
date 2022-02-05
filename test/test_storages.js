@@ -94,5 +94,38 @@ Object.keys(stores_map).forEach(storage_name => {
       await b1.clear()
       await b2.clear()
     })
+
+    it('get all keys', async () => {
+      await bkv.clear()
+
+      await bkv.set(key, obj)
+      await bkv.set(key2, obj2)
+
+      const res = await bkv.getAll()
+
+      const expected = [
+        { key: key, value: obj },
+        { key: key2, value: obj2 }
+      ]
+
+      assert.deepEqual(res.sort((o1, o2) => o1.key.localeCompare(o2.key)), expected)
+
+      await bkv.clear()
+    })
+
+    it('get all keys except expired', async () => {
+      await bkv.clear()
+
+      await bkv.set(key, obj)
+      await bkv.set(key2, obj2, 0.005)
+
+      await pTimeout(10)
+      const res = await bkv.getAll()
+
+      assert.deepEqual(res, [{ key: key, value: obj }])
+
+      await bkv.clear()
+    })
+
   })
 })

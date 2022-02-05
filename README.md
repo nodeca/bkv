@@ -48,12 +48,18 @@ Options:
 
 \* `zero` is simple memory store for silent fallback when no persistent storages available.
 
-### .get(key [, default]) -> Promise
+
+### .get(key [, default]) => Promise
 
 Load data by `key` name. If not exists - returns `default` (if passed) or `undefined`.
 
 
-### .set(key, data [, ttl]) -> Promise
+### .getAll() => Promise
+
+Load all data from storage as `[ { key, value }, { key, value }, ... ]`.
+
+
+### .set(key, data [, ttl]) => Promise
 
 Put data into storage under `key` name.
 
@@ -62,18 +68,18 @@ Put data into storage under `key` name.
 - `ttl` - Expiration time in seconds. Default = 0 (don't expire).
 
 
-### .remove(key) -> Promise
+### .remove(key) => Promise
 
 Remove `key` data from store.
 
 
-### .clear([expiredOnly]) -> Promise
+### .clear([expiredOnly]) => Promise
 
 Clear all storage data (in your namespace), or just expired objects when called
 with `true` param.
 
 
-### .init() -> Promise
+### .init() => Promise
 
 Auto-executed on first call of any method. Usually not needed. But may be used,
 if you need exact info about availability of persistent storage, prior to start.
