@@ -1,9 +1,35 @@
-/*! bkv 1.0.1 https://github.com/nodeca/bkv @license MIT */
+/*! bkv 1.0.2 https://github.com/nodeca/bkv @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
   (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.BKV = factory());
 })(this, (function () { 'use strict';
+
+  function ownKeys(object, enumerableOnly) {
+    var keys = Object.keys(object);
+
+    if (Object.getOwnPropertySymbols) {
+      var symbols = Object.getOwnPropertySymbols(object);
+      enumerableOnly && (symbols = symbols.filter(function (sym) {
+        return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+      })), keys.push.apply(keys, symbols);
+    }
+
+    return keys;
+  }
+
+  function _objectSpread2(target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = null != arguments[i] ? arguments[i] : {};
+      i % 2 ? ownKeys(Object(source), !0).forEach(function (key) {
+        _defineProperty(target, key, source[key]);
+      }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) {
+        Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
+      });
+    }
+
+    return target;
+  }
 
   function _classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
@@ -28,6 +54,21 @@
       writable: false
     });
     return Constructor;
+  }
+
+  function _defineProperty(obj, key, value) {
+    if (key in obj) {
+      Object.defineProperty(obj, key, {
+        value: value,
+        enumerable: true,
+        configurable: true,
+        writable: true
+      });
+    } else {
+      obj[key] = value;
+    }
+
+    return obj;
   }
 
   var LlStorage = /*#__PURE__*/function () {
@@ -122,13 +163,37 @@
         }
       }
     }, {
+      key: "getAll",
+      value: function getAll() {
+        try {
+          var out = [];
+
+          for (var _i2 = 0, _Object$keys2 = Object.keys(localStorage); _i2 < _Object$keys2.length; _i2++) {
+            var name = _Object$keys2[_i2];
+            var key = name.split(this._ns)[1];
+            if (!key) continue;
+
+            var res = this._get_sync(key);
+
+            if (typeof res === 'undefined') continue;
+            out.push(_objectSpread2({
+              key: key
+            }, res));
+          }
+
+          return Promise.resolve(out);
+        } catch (e) {
+          return Promise.reject(e);
+        }
+      }
+    }, {
       key: "clear",
       value: function clear(expiredOnly) {
         try {
           var now = Date.now();
 
-          for (var _i2 = 0, _Object$keys2 = Object.keys(localStorage); _i2 < _Object$keys2.length; _i2++) {
-            var name = _Object$keys2[_i2];
+          for (var _i3 = 0, _Object$keys3 = Object.keys(localStorage); _i3 < _Object$keys3.length; _i3++) {
+            var name = _Object$keys3[_i3];
             var key = name.split(this._ns)[1];
             if (!key) continue;
 
@@ -325,12 +390,38 @@
         });
       }
     }, {
-      key: "clear",
-      value: function clear(expiredOnly) {
+      key: "getAll",
+      value: function getAll() {
         var _this6 = this;
 
         return new Promise(function (resolve, reject) {
-          var tx = _this6.db.transaction(['kv'], 'readwrite');
+          var tx = _this6.db.transaction(['kv']);
+
+          tx.onerror = function (e) {
+            reject(new Error("".concat(ERR_NS, " Data get error: ").concat(e.target)));
+          };
+
+          var out = [];
+
+          tx.objectStore('kv').openCursor().onsuccess = function (e) {
+            var cursor = e.target.result;
+
+            if (cursor) {
+              out.push(cursor.value);
+              cursor.continue();
+            } else {
+              resolve(out);
+            }
+          };
+        });
+      }
+    }, {
+      key: "clear",
+      value: function clear(expiredOnly) {
+        var _this7 = this;
+
+        return new Promise(function (resolve, reject) {
+          var tx = _this7.db.transaction(['kv'], 'readwrite');
 
           tx.oncomplete = function () {
             resolve();
@@ -343,7 +434,7 @@
           var store = tx.objectStore('kv');
 
           if (expiredOnly) {
-            store.index('expire').openCursor(_this6.wikr.bound(1, Date.now())).onsuccess = function (e) {
+            store.index('expire').openCursor(_this7.wikr.bound(1, Date.now())).onsuccess = function (e) {
               var cursor = e.target.result;
 
               if (cursor) {
@@ -396,6 +487,19 @@
       key: "get",
       value: function get(key) {
         return Promise.resolve(zs[this._ns][key] || {});
+      }
+    }, {
+      key: "getAll",
+      value: function getAll() {
+        var _this = this;
+
+        var out = [];
+        Object.keys(zs[this._ns]).forEach(function (key) {
+          out.push(_objectSpread2({
+            key: key
+          }, zs[_this._ns][key]));
+        });
+        return Promise.resolve(out);
       }
     }, {
       key: "clear",
@@ -452,7 +556,7 @@
           p = p.then(function (prev) {
             // Skip on success
             if (prev) return true;
-            var lc_name = name.toLocaleLowerCase();
+            var lc_name = name.toLowerCase();
             _this.storage_name = lc_name;
             _this.storage = new storages[lc_name](_this._prefix);
             return _this.storage.init().then(function () {
@@ -506,21 +610,43 @@
         });
       }
     }, {
-      key: "remove",
-      value: function remove(key) {
+      key: "getAll",
+      value: function getAll() {
         var _this4 = this;
 
         return this.init().then(function () {
-          return _this4.storage.remove(key);
+          return _this4.storage.getAll();
+        }).then(function (arr) {
+          var out = arr.filter(function (d) {
+            return d.expire === 0 || d.expire > Date.now();
+          }).map(function (d) {
+            return {
+              key: d.key,
+              value: d.value
+            };
+          });
+          if (out.length === arr.length) return out;
+          return _this4.clear(true).then(function () {
+            return out;
+          });
+        });
+      }
+    }, {
+      key: "remove",
+      value: function remove(key) {
+        var _this5 = this;
+
+        return this.init().then(function () {
+          return _this5.storage.remove(key);
         });
       }
     }, {
       key: "clear",
       value: function clear(expiredOnly) {
-        var _this5 = this;
+        var _this6 = this;
 
         return this.init().then(function () {
-          return _this5.storage.clear(expiredOnly);
+          return _this6.storage.clear(expiredOnly);
         });
       }
     }], [{
