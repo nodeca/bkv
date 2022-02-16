@@ -68,9 +68,9 @@ Put data into storage under `key` name.
 - `ttl` - Expiration time in seconds. Default = 0 (don't expire).
 
 
-### .remove(key) => Promise
+### .remove(key | [keys]) => Promise
 
-Remove `key` data from store.
+Remove `key` data from store. If `Array` passed - remove all listed keys.
 
 
 ### .clear([expiredOnly]) => Promise

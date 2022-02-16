@@ -1,4 +1,4 @@
-/*! bkv 1.0.2 https://github.com/nodeca/bkv @license MIT */
+/*! bkv 1.0.3 https://github.com/nodeca/bkv @license MIT */
 function ownKeys(object, enumerableOnly) {
   var keys = Object.keys(object);
 
@@ -630,9 +630,13 @@ var BKV = /*#__PURE__*/function () {
     value: function remove(key) {
       var _this5 = this;
 
-      return this.init().then(function () {
+      if (!Array.isArray(key)) return this.init().then(function () {
         return _this5.storage.remove(key);
-      });
+      }); // Multiple keys
+
+      return Promise.all(key.map(function (k) {
+        return _this5.remove(k);
+      }));
     }
   }, {
     key: "clear",

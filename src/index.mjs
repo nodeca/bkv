@@ -89,7 +89,10 @@ class BKV {
   }
 
   remove (key) {
-    return this.init().then(() => this.storage.remove(key))
+    if (!Array.isArray(key)) return this.init().then(() => this.storage.remove(key))
+
+    // Multiple keys
+    return Promise.all(key.map(k => this.remove(k)))
   }
 
   clear (expiredOnly) {

@@ -1,4 +1,4 @@
-/*! bkv 1.0.2 https://github.com/nodeca/bkv @license MIT */
+/*! bkv 1.0.3 https://github.com/nodeca/bkv @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
@@ -636,9 +636,13 @@
       value: function remove(key) {
         var _this5 = this;
 
-        return this.init().then(function () {
+        if (!Array.isArray(key)) return this.init().then(function () {
           return _this5.storage.remove(key);
-        });
+        }); // Multiple keys
+
+        return Promise.all(key.map(function (k) {
+          return _this5.remove(k);
+        }));
       }
     }, {
       key: "clear",

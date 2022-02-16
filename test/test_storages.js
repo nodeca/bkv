@@ -40,6 +40,21 @@ Object.keys(stores_map).forEach(storage_name => {
       assert.isUndefined(await bkv.get(key))
     })
 
+    it('remove not existing key', async () => {
+      await bkv.remove(`foobar${Math.random()}`)
+    })
+
+    it('remove multiple keys', async () => {
+      await bkv.set(key, obj)
+      await bkv.set(key2, obj2)
+      assert.deepEqual(await bkv.get(key), obj)
+      assert.deepEqual(await bkv.get(key2), obj2)
+      await bkv.remove([key, key2])
+      assert.isUndefined(await bkv.get(key))
+      assert.isUndefined(await bkv.get(key2))
+    })
+
+
     it('persistance', async () => {
       await bkv.set(key, obj)
       await bkv.clear(true)
